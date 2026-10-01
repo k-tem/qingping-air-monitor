@@ -218,7 +218,7 @@ class QingpingPlatform {
       const timestamp = Date.now().toString();
       const response = await fetch(
         `${DEVICES_URL}?${new URLSearchParams({ timestamp, offset: '0', limit: '50' })}`,
-        { headers: { Authorization: token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await this.parseResponse(response, 'Qingping device query');
       const configuredMac = this.normalizeMac(this.config.mac);

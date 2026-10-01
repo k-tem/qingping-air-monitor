@@ -9,7 +9,7 @@ function platform(config = {}) {
   const instance = Object.create(QingpingPlatform.prototype);
   instance.config = config;
   instance.services = new Map();
-  instance.log = { debug() {} };
+  instance.log = { debug() {}, error() {} };
   return instance;
 }
 
@@ -78,6 +78,29 @@ test('caches a Qingping Cloud OAuth token until it expires', async (t) => {
   assert.equal(await instance.getAccessToken(), 'token');
   assert.equal(requests.length, 1);
   assert.equal(requests[0].options.headers.Authorization, 'Basic YXBwLWtleTphcHAtc2VjcmV0');
+});
+
+test('sends Qingping API requests with a Bearer access token', async (t) => {
+  const instance = platform({ mac: '58:2D:34:70:56:C8' });
+  const originalFetch = global.fetch;
+  const requests = [];
+
+  instance.getAccessToken = async () => 'access-token';
+  instance.updateMeasurements = () => {};
+  global.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return {
+      ok: true,
+      text: async () => JSON.stringify({ devices: [] }),
+    };
+  };
+  t.after(() => {
+    global.fetch = originalFetch;
+  });
+
+  await instance.pollDevice();
+
+  assert.equal(requests[0].options.headers.Authorization, 'Bearer access-token');
 });
 
 test('uses the HAP Battery service available in Homebridge', () => {
