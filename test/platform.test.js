@@ -134,8 +134,8 @@ test('defines custom noise properties without version-specific HAP constants', (
 });
 
 test('uses a validated millisecond update interval', () => {
-  assert.equal(platform().getUpdateInterval(), 60_000);
+  assert.equal(platform().getUpdateInterval(), 1_000);
   assert.equal(platform({ updateInterval: 2_500 }).getUpdateInterval(), 2_500);
-  assert.equal(platform({ updateInterval: 999 }).getUpdateInterval(), 60_000);
-  assert.equal(platform({ updateInterval: 'invalid' }).getUpdateInterval(), 60_000);
+  assert.equal(platform({ updateInterval: 999 }).getUpdateInterval(), 1_000);
+  assert.equal(platform({ updateInterval: 'invalid' }).getUpdateInterval(), 1_000);
 });

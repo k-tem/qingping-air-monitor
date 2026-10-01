@@ -5,7 +5,7 @@ const MANUFACTURER = 'Qingping';
 const MODEL = 'CGS2';
 const OAUTH_URL = 'https://oauth.cleargrass.com/oauth2/token';
 const DEVICES_URL = 'https://apis.cleargrass.com/v1/apis/devices';
-const DEFAULT_UPDATE_INTERVAL = 60_000;
+const DEFAULT_UPDATE_INTERVAL = 1_000;
 const MINIMUM_UPDATE_INTERVAL = 1_000;
 const MEASUREMENT_DEFAULTS = Object.freeze({
   temperature: true,

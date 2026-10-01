@@ -1,6 +1,6 @@
 {
   "name": "homebridge-qingping-cgs2",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Homebridge plugin for Qingping Air Monitor Gen 2 (CGS2) via Qingping Cloud",
   "main": "src/index.js",
   "engines": {
