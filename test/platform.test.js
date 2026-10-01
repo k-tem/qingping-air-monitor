@@ -89,3 +89,13 @@ test('uses the HAP Battery service available in Homebridge', () => {
   assert.match(source, /Service\.Battery/);
   assert.doesNotMatch(source, /Service\.BatteryService/);
 });
+
+test('uses the HAP UUID utility module for custom services', () => {
+  const source = require('node:fs').readFileSync(
+    require.resolve('../src/platform'),
+    'utf8'
+  );
+
+  assert.match(source, /uuid\.generate/);
+  assert.doesNotMatch(source, /UUID\.generate/);
+});

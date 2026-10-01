@@ -76,7 +76,7 @@ class QingpingPlatform {
   }
 
   setupMeasurementServices(accessory) {
-    const { Service, Characteristic, UUID } = this.api.hap;
+    const { Service, Characteristic, uuid } = this.api.hap;
     this.services.clear();
 
     if (this.isMeasurementEnabled('temperature')) {
@@ -142,7 +142,7 @@ class QingpingPlatform {
     if (this.isMeasurementEnabled('noise')) {
       this.addNoiseService(accessory);
     } else {
-      this.removeService(accessory, UUID.generate(`${PLUGIN_NAME}:NoiseService`));
+      this.removeService(accessory, uuid.generate(`${PLUGIN_NAME}:NoiseService`));
     }
 
   }
@@ -162,10 +162,10 @@ class QingpingPlatform {
   }
 
   addNoiseService(accessory) {
-    const { Service, Characteristic, UUID } = this.api.hap;
+    const { Service, Characteristic, uuid } = this.api.hap;
 
-    const noiseServiceUUID = UUID.generate(`${PLUGIN_NAME}:NoiseService`);
-    const noiseCharacteristicUUID = UUID.generate(`${PLUGIN_NAME}:NoiseLevel`);
+    const noiseServiceUUID = uuid.generate(`${PLUGIN_NAME}:NoiseService`);
+    const noiseCharacteristicUUID = uuid.generate(`${PLUGIN_NAME}:NoiseLevel`);
 
     class NoiseLevelCharacteristic extends Characteristic {
       constructor() {
