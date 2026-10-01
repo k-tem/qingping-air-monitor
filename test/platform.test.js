@@ -98,3 +98,14 @@ test('uses the HAP UUID utility module for custom services', () => {
   assert.match(source, /uuid\.generate/);
   assert.doesNotMatch(source, /UUID\.generate/);
 });
+
+test('defines custom noise properties without version-specific HAP constants', () => {
+  const source = require('node:fs').readFileSync(
+    require.resolve('../src/platform'),
+    'utf8'
+  );
+
+  assert.match(source, /format: 'uint16'/);
+  assert.match(source, /perms: \['pr', 'ev'\]/);
+  assert.doesNotMatch(source, /Characteristic\.(Formats|Perms)/);
+});

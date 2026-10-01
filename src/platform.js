@@ -171,12 +171,12 @@ class QingpingPlatform {
       constructor() {
         super('Noise', noiseCharacteristicUUID);
         this.setProps({
-          format: Characteristic.Formats.UINT16,
+          format: 'uint16',
           unit: 'dB',
           minValue: 0,
           maxValue: 150,
           minStep: 1,
-          perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
+          perms: ['pr', 'ev'],
         });
         this.value = this.getDefaultValue();
       }
