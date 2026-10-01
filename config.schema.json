@@ -34,6 +34,14 @@
         "secure": true,
         "required": true
       },
+      "updateInterval": {
+        "title": "Data update interval (milliseconds)",
+        "type": "integer",
+        "default": 60000,
+        "minimum": 1000,
+        "maximum": 3600000,
+        "description": "How often to request the latest measurements from Qingping Cloud. Minimum: 1000 ms."
+      },
       "temperature": {
         "title": "Temperature",
         "type": "boolean",
@@ -86,7 +94,7 @@
     {
       "type": "fieldset",
       "title": "Qingping+ account",
-      "items": ["appKey", "appSecret"]
+      "items": ["appKey", "appSecret", "updateInterval"]
     },
     {
       "type": "fieldset",

@@ -10,9 +10,10 @@ Install the plugin, then open its settings in Homebridge. The form contains only
 - **Name in Apple Home** - the accessory name shown when pairing with HomeKit.
 - **Device MAC address** - the MAC address from Qingping+; `58:2D:34:70:56:C8` and `582D347056C8` both work.
 - **Qingping+ App Key** and **App Secret** - API credentials created in the [Qingping Developer Platform](https://developer.qingping.co/). The Qingping+ account that owns the monitor must authorize this application.
+- **Data update interval** - how often, in milliseconds, the plugin requests new measurements. The default is `60000` (one minute); the minimum is `1000`.
 - **Measurements** - select which sensor values to expose.
 
-The plugin polls Qingping Cloud once per minute. No local MQTT broker, topic, or device-side MQTT setup is needed.
+No local MQTT broker, topic, or device-side MQTT setup is needed.
 
 ## Supported measurements
 

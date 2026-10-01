@@ -132,3 +132,10 @@ test('defines custom noise properties without version-specific HAP constants', (
   assert.match(source, /perms: \['pr', 'ev'\]/);
   assert.doesNotMatch(source, /Characteristic\.(Formats|Perms)/);
 });
+
+test('uses a validated millisecond update interval', () => {
+  assert.equal(platform().getUpdateInterval(), 60_000);
+  assert.equal(platform({ updateInterval: 2_500 }).getUpdateInterval(), 2_500);
+  assert.equal(platform({ updateInterval: 999 }).getUpdateInterval(), 60_000);
+  assert.equal(platform({ updateInterval: 'invalid' }).getUpdateInterval(), 60_000);
+});

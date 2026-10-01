@@ -5,6 +5,8 @@ const MANUFACTURER = 'Qingping';
 const MODEL = 'CGS2';
 const OAUTH_URL = 'https://oauth.cleargrass.com/oauth2/token';
 const DEVICES_URL = 'https://apis.cleargrass.com/v1/apis/devices';
+const DEFAULT_UPDATE_INTERVAL = 60_000;
+const MINIMUM_UPDATE_INTERVAL = 1_000;
 const MEASUREMENT_DEFAULTS = Object.freeze({
   temperature: true,
   humidity: true,
@@ -26,6 +28,7 @@ class QingpingPlatform {
     this.accessToken = undefined;
     this.accessTokenExpiresAt = 0;
     this.pollTimer = undefined;
+    this.pollInProgress = false;
 
     this.api.on('didFinishLaunching', () => {
       this.discoverDevice();
@@ -207,12 +210,28 @@ class QingpingPlatform {
       return;
     }
 
-    this.pollDevice();
-    this.pollTimer = setInterval(() => this.pollDevice(), 60_000);
+    const interval = this.getUpdateInterval();
+    this.log.info(`Qingping Cloud updates every ${interval} ms.`);
+    void this.pollDevice();
+    this.pollTimer = setInterval(() => void this.pollDevice(), interval);
     this.pollTimer.unref();
   }
 
+  getUpdateInterval() {
+    const interval = Number(this.config.updateInterval);
+    return Number.isFinite(interval) && interval >= MINIMUM_UPDATE_INTERVAL
+      ? Math.floor(interval)
+      : DEFAULT_UPDATE_INTERVAL;
+  }
+
   async pollDevice() {
+    if (this.pollInProgress) {
+      this.log.debug('Qingping Cloud update skipped because the previous request is still running.');
+      return;
+    }
+
+    this.pollInProgress = true;
+
     try {
       const token = await this.getAccessToken();
       const timestamp = Date.now().toString();
@@ -238,6 +257,8 @@ class QingpingPlatform {
       this.updateMeasurements(device.data, device.info?.version);
     } catch (err) {
       this.log.error(`Qingping Cloud update failed: ${err.message}`);
+    } finally {
+      this.pollInProgress = false;
     }
   }
 
