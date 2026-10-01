@@ -1,0 +1,97 @@
+{
+  "pluginAlias": "Qingping CGS2",
+  "pluginType": "platform",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Device name",
+        "type": "string",
+        "default": "Qingping Air Monitor 2",
+        "required": true
+      },
+      "homeKitName": {
+        "title": "Name in Apple Home",
+        "type": "string",
+        "default": "Qingping Air Monitor 2",
+        "required": true
+      },
+      "mac": {
+        "title": "Device MAC address",
+        "type": "string",
+        "required": true,
+        "pattern": "^[0-9A-Fa-f]{2}([:\\- ]?[0-9A-Fa-f]{2}){5}$",
+        "description": "The MAC address shown in Qingping+; separators are optional."
+      },
+      "appKey": {
+        "title": "Qingping+ App Key",
+        "type": "string",
+        "required": true
+      },
+      "appSecret": {
+        "title": "Qingping+ App Secret",
+        "type": "string",
+        "secure": true,
+        "required": true
+      },
+      "temperature": {
+        "title": "Temperature",
+        "type": "boolean",
+        "default": true
+      },
+      "humidity": {
+        "title": "Humidity",
+        "type": "boolean",
+        "default": true
+      },
+      "co2": {
+        "title": "CO₂",
+        "type": "boolean",
+        "default": true
+      },
+      "pm25": {
+        "title": "PM2.5",
+        "type": "boolean",
+        "default": true
+      },
+      "pm10": {
+        "title": "PM10",
+        "type": "boolean",
+        "default": true
+      },
+      "tvoc": {
+        "title": "VOC index / eTVOC",
+        "type": "boolean",
+        "default": true
+      },
+      "noise": {
+        "title": "Noise (custom HomeKit characteristic)",
+        "type": "boolean",
+        "default": false
+      },
+      "battery": {
+        "title": "Battery",
+        "type": "boolean",
+        "default": true
+      }
+    },
+    "required": ["name", "homeKitName", "mac", "appKey", "appSecret"]
+  },
+  "form": [
+    {
+      "type": "fieldset",
+      "title": "Qingping device",
+      "items": ["name", "homeKitName", "mac"]
+    },
+    {
+      "type": "fieldset",
+      "title": "Qingping+ account",
+      "items": ["appKey", "appSecret"]
+    },
+    {
+      "type": "fieldset",
+      "title": "Measurements",
+      "items": ["temperature", "humidity", "co2", "pm25", "pm10", "tvoc", "noise", "battery"]
+    }
+  ]
+}

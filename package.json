@@ -1,0 +1,35 @@
+{
+  "name": "homebridge-qingping-cgs2",
+  "version": "1.0.1",
+  "description": "Homebridge plugin for Qingping Air Monitor Gen 2 (CGS2) via Qingping Cloud",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "homebridge": ">=1.8.0"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "qingping",
+    "cgs2",
+    "air-monitor",
+    "qingping-cloud",
+    "homekit"
+  ],
+  "license": "MIT",
+  "author": "Your Name",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USER/homebridge-qingping-cgs2.git"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "peerDependencies": {
+    "homebridge": ">=1.8.0"
+  },
+  "homebridge": {
+    "pluginAlias": "Qingping CGS2",
+    "pluginType": "platform"
+  }
+}
