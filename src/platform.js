@@ -7,6 +7,8 @@ const OAUTH_URL = 'https://oauth.cleargrass.com/oauth2/token';
 const DEVICES_URL = 'https://apis.cleargrass.com/v1/apis/devices';
 const DEFAULT_UPDATE_INTERVAL = 1_000;
 const MINIMUM_UPDATE_INTERVAL = 1_000;
+const MAXIMUM_RETRY_INTERVAL = 300_000;
+const RETRIABLE_HTTP_STATUSES = new Set([429, 502, 503, 504]);
 const MEASUREMENT_DEFAULTS = Object.freeze({
   temperature: true,
   humidity: true,
@@ -29,14 +31,18 @@ class QingpingPlatform {
     this.accessTokenExpiresAt = 0;
     this.pollTimer = undefined;
     this.pollInProgress = false;
+    this.pollingStopped = false;
+    this.retryCount = 0;
+    this.retryInterval = undefined;
 
     this.api.on('didFinishLaunching', () => {
       this.discoverDevice();
     });
 
     this.api.on('shutdown', () => {
+      this.pollingStopped = true;
       if (this.pollTimer) {
-        clearInterval(this.pollTimer);
+        clearTimeout(this.pollTimer);
       }
     });
   }
@@ -212,8 +218,18 @@ class QingpingPlatform {
 
     const interval = this.getUpdateInterval();
     this.log.info(`Qingping Cloud updates every ${interval} ms.`);
-    void this.pollDevice();
-    this.pollTimer = setInterval(() => void this.pollDevice(), interval);
+    this.pollingStopped = false;
+    this.schedulePoll(0);
+  }
+
+  schedulePoll(delay) {
+    this.pollTimer = setTimeout(async () => {
+      await this.pollDevice();
+
+      if (!this.pollingStopped) {
+        this.schedulePoll(this.retryInterval || this.getUpdateInterval());
+      }
+    }, delay);
     this.pollTimer.unref();
   }
 
@@ -247,7 +263,7 @@ class QingpingPlatform {
 
       if (!device) {
         this.log.error(`Qingping device ${this.maskMac(configuredMac)} was not found in this account.`);
-        return;
+        return false;
       }
 
       if (device.info?.status?.offline) {
@@ -255,8 +271,13 @@ class QingpingPlatform {
       }
 
       this.updateMeasurements(device.data, device.info?.version);
+      this.retryCount = 0;
+      this.retryInterval = undefined;
+      return true;
     } catch (err) {
+      this.setRetryInterval(err);
       this.log.error(`Qingping Cloud update failed: ${err.message}`);
+      return false;
     } finally {
       this.pollInProgress = false;
     }
@@ -292,20 +313,44 @@ class QingpingPlatform {
 
   async parseResponse(response, operation) {
     const body = await response.text();
-    let data;
+
+    if (!response.ok) {
+      let detail = `HTTP ${response.status}`;
+
+      try {
+        const data = JSON.parse(body);
+        detail = data.error_description || data.message || data.error || detail;
+      } catch {
+        // Error responses from Qingping Cloud can be an HTML gateway page.
+      }
+
+      const error = new Error(`${operation} failed (HTTP ${response.status}): ${detail}`);
+      error.status = response.status;
+      throw error;
+    }
 
     try {
-      data = JSON.parse(body);
+      return JSON.parse(body);
     } catch {
       throw new Error(`${operation} returned invalid JSON (HTTP ${response.status}).`);
     }
+  }
 
-    if (!response.ok) {
-      const detail = data.error_description || data.message || data.error || 'unknown error';
-      throw new Error(`${operation} failed (HTTP ${response.status}): ${detail}`);
+  setRetryInterval(error) {
+    if (!RETRIABLE_HTTP_STATUSES.has(error.status)) {
+      this.retryCount = 0;
+      this.retryInterval = undefined;
+      return;
     }
 
-    return data;
+    this.retryCount = (this.retryCount || 0) + 1;
+    this.retryInterval = Math.min(
+      this.getUpdateInterval() * 2 ** this.retryCount,
+      MAXIMUM_RETRY_INTERVAL
+    );
+    this.log.warn(
+      `Qingping Cloud is temporarily unavailable; retrying in ${this.retryInterval} ms.`
+    );
   }
 
   updateMeasurements(sample, firmwareVersion) {

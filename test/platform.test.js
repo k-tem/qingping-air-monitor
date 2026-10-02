@@ -9,7 +9,7 @@ function platform(config = {}) {
   const instance = Object.create(QingpingPlatform.prototype);
   instance.config = config;
   instance.services = new Map();
-  instance.log = { debug() {}, error() {} };
+  instance.log = { debug() {}, error() {}, warn() {} };
   return instance;
 }
 
@@ -138,4 +138,31 @@ test('uses a validated millisecond update interval', () => {
   assert.equal(platform({ updateInterval: 2_500 }).getUpdateInterval(), 2_500);
   assert.equal(platform({ updateInterval: 999 }).getUpdateInterval(), 1_000);
   assert.equal(platform({ updateInterval: 'invalid' }).getUpdateInterval(), 1_000);
+});
+
+test('reports an HTTP gateway failure without claiming the response is invalid JSON', async () => {
+  const instance = platform();
+  const response = {
+    ok: false,
+    status: 504,
+    text: async () => '<html>gateway timeout</html>',
+  };
+
+  await assert.rejects(
+    instance.parseResponse(response, 'Qingping device query'),
+    (error) => error.message === 'Qingping device query failed (HTTP 504): HTTP 504'
+      && error.status === 504
+  );
+});
+
+test('backs off exponentially for transient Qingping Cloud failures', () => {
+  const instance = platform({ updateInterval: 1_000 });
+
+  instance.setRetryInterval({ status: 504 });
+  assert.equal(instance.retryInterval, 2_000);
+  instance.setRetryInterval({ status: 504 });
+  assert.equal(instance.retryInterval, 4_000);
+  instance.setRetryInterval({ status: 401 });
+  assert.equal(instance.retryInterval, undefined);
+  assert.equal(instance.retryCount, 0);
 });
