@@ -34,6 +34,8 @@ After saving the configuration and restarting Homebridge, locate the **Name in A
 
 PM2.5, PM10, and VOC are characteristics of HomeKit's Air Quality service. Apple Home shows the resulting air-quality state; apps such as Eve or Controller for HomeKit can show each individual value. Noise uses a custom characteristic and may likewise require a third-party HomeKit app.
 
+Apple Home displays CO2 as detected/not detected and combines PM2.5, PM10, and VOC into one qualitative Air Quality tile. This is an Apple Home UI limitation: the plugin still sends the standard numeric HomeKit characteristics, which are visible in Eve, Controller for HomeKit, and other full-featured HomeKit apps.
+
 ### Choosing HomeKit ports
 
 The external HomeKit accessory is assigned a local listening port by Homebridge. To restrict it to your own port range, configure the global Homebridge `ports` range (not a plugin setting):

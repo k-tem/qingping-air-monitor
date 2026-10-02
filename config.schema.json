@@ -55,27 +55,32 @@
       "co2": {
         "title": "CO₂",
         "type": "boolean",
-        "default": true
+        "default": true,
+        "description": "Apple Home shows detected/not detected, not the numeric CO₂ value. Use Eve or Controller for HomeKit to view ppm."
       },
       "pm25": {
         "title": "PM2.5",
         "type": "boolean",
-        "default": true
+        "default": true,
+        "description": "Apple Home combines this into the qualitative Air Quality tile. Use Eve or Controller for HomeKit to view the numeric value."
       },
       "pm10": {
         "title": "PM10",
         "type": "boolean",
-        "default": true
+        "default": true,
+        "description": "Apple Home combines this into the qualitative Air Quality tile. Use Eve or Controller for HomeKit to view the numeric value."
       },
       "tvoc": {
         "title": "VOC index / eTVOC",
         "type": "boolean",
-        "default": true
+        "default": true,
+        "description": "Apple Home combines this into the qualitative Air Quality tile. Use Eve or Controller for HomeKit to view the numeric value."
       },
       "noise": {
         "title": "Noise (custom HomeKit characteristic)",
         "type": "boolean",
-        "default": false
+        "default": false,
+        "description": "Apple Home does not display custom noise characteristics. Use Eve or Controller for HomeKit to view decibels."
       },
       "battery": {
         "title": "Battery",
@@ -94,7 +99,14 @@
     {
       "type": "fieldset",
       "title": "Qingping+ account",
-      "items": ["appKey", "appSecret", "updateInterval"]
+      "items": [
+        "appKey",
+        "appSecret",
+        {
+          "key": "updateInterval",
+          "type": "number"
+        }
+      ]
     },
     {
       "type": "fieldset",
